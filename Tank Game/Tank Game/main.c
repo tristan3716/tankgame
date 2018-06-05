@@ -9,7 +9,7 @@ unsigned int WINAPI playSoundThread(void *arg) {
 }
 
 unsigned int WINAPI handleScreen(void *arg) {
-	console_setWhite();
+	//console_setWhite();
 	ScreenInit();
 
 	RenderLoading();

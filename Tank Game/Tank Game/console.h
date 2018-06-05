@@ -1,3 +1,4 @@
+
 #pragma once
 
 #define col GetStdHandle(STD_OUTPUT_HANDLE)

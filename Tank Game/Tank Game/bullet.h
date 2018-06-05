@@ -16,4 +16,3 @@ struct Bullet {
 int hBullet;
 struct Bullet g_Tank_Bullet[5];
 
-void handleBullet(void);

@@ -1,3 +1,4 @@
+
 #include "console.h"
 
 #include <Windows.h>
