@@ -84,6 +84,8 @@ int getOldIndex(int n) {
 void ScreenRemove(int x, int y, char* string) {
 	DWORD dw;
 	COORD CursorPosition = { x, y };
+	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
+	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
 	SetConsoleCursorPosition(g_hScreen[!g_nScreenIndex], CursorPosition);
 	WriteFile(g_hScreen[!g_nScreenIndex], string, strlen(string), &dw, NULL);
 	//SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
@@ -187,6 +189,15 @@ void Update() {
 		}
 	}
 }
+/* =======================================================================================
+
+		Render()
+		State Flow
+		Default -> Moved -> Hold -> None
+		        -> Turn  -> Hold -> None
+				-> Hold  ->
+
+   --------------------------------------------------------------------------------------- */
 
 void Render(int **map) {
 	char str[100];
@@ -233,12 +244,15 @@ void Render(int **map) {
 
 	// DEBUG SOURCE
 	//SetColor(1);
+	//Sleep(500);
 	sprintf(str, "CS : %d", g_nScreenIndex);
 	ScreenPrint(62, 0, str);
 	sprintf(str, "c : (%d, %d)", g_Tank.nPos.X, g_Tank.nPos.Y);
 	ScreenPrint(62, 1, str); 
 	sprintf(str, "old : (%d, %d)", g_Tank.nOldPos.X, g_Tank.nOldPos.Y);
-	ScreenPrint(62, 2, str);
+	ScreenPrint(62, 2, str); 
+	sprintf(str, "state : %d", g_Tank.flag);
+	ScreenPrint(62, 12, str);
 
 
 	sprintf(str, "g_Tank");
