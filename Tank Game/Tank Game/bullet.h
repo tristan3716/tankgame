@@ -10,6 +10,7 @@ struct Bullet {
 	int nOldMoveTime;
 	COORD nPos;
 	COORD nOldPos;
+	int state;
 };
 
 int hBullet;

@@ -3,6 +3,7 @@
 struct Tank g_Tank;
 
 void initiateTank(void) {
+	g_Tank.flag = FLAG_DEFAULT;
 	g_Tank.nPos.X = 10;
 	g_Tank.nPos.Y = 10;
 	g_Tank.nMoveTime = 33;

@@ -84,8 +84,8 @@ int getOldIndex(int n) {
 void ScreenRemove(int x, int y, char* string) {
 	DWORD dw;
 	COORD CursorPosition = { x, y };
-	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
-	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
+	SetConsoleCursorPosition(g_hScreen[!g_nScreenIndex], CursorPosition);
+	WriteFile(g_hScreen[!g_nScreenIndex], string, strlen(string), &dw, NULL);
 	//SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
 	//WriteFile(g_hScreen[1], string, strlen(string), &dw, NULL);
 }
@@ -94,7 +94,7 @@ void ScreenPrintFPS(int x, int y, double num) {
 	//COORD coord = { x + 8, y };
 	unsigned char buffer[64];
 	
-	sprintf(buffer, "%5lf", num);
+	sprintf(buffer, "%.2lf", num);
 	//SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], coord);
 	ScreenPrint(x+8, y, buffer);
 }
@@ -166,6 +166,7 @@ void Update() {
 	for (i = 0; i < 5; i++) {
 		if (g_Tank_Bullet[i].nLife == 1) {
 			if (nCurTime - g_Tank_Bullet[i].nOldMoveTime >= BULLET_MOVE_DELAY) {
+				g_Tank_Bullet[i].state = FLAG_MOVED;
 				g_Tank_Bullet[i].nOldPos = g_Tank_Bullet[i].nPos;
 				switch (g_Tank_Bullet[i].nDirect) {
 				case UP:
@@ -191,27 +192,41 @@ void Render(int **map) {
 	char str[100];
 	int i;
 	//ScreenClear();
-	ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
+	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_HOLD) {
+		ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
+	}
 	for (i = 0; i < 5; i++) {
-		ScreenRemove(g_Tank_Bullet[i].nOldPos.X, g_Tank_Bullet[i].nOldPos.Y, "  ");
+		if (g_Tank_Bullet[i].state == FLAG_MOVED || g_Tank_Bullet[i].state == FLAG_HOLD) {
+			ScreenRemove(g_Tank_Bullet[i].nOldPos.X, g_Tank_Bullet[i].nOldPos.Y, "  ");
+		}
 	}
 
 	//EnterCriticalSection(&g_cs);
 	ScreenPrintFPS(0, 0, fps);
-	switch (g_Tank.nDirect) {
-		case UP:
-			//SetColor(12);
-			ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▲"); break;
-		case DOWN:
-			//SetColor(12);
-			ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▼"); break;
-		case RIGHT:
-			//SetColor(12);
-			ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▶"); break;
-		case LEFT:
-			//SetColor(12);
-			ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "◀"); break;
-		default:break;
+	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_TURN || g_Tank.flag == FLAG_HOLD || g_Tank.flag == FLAG_DEFAULT) {
+		switch (g_Tank.nDirect) {
+			case UP:
+				//SetColor(12);
+				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▲"); break;
+			case DOWN:
+				//SetColor(12);
+				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▼"); break;
+			case RIGHT:
+				//SetColor(12);
+				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "▶"); break;
+			case LEFT:
+				//SetColor(12);
+				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "◀"); break;
+			default:break;
+		}
+		switch(g_Tank.flag){
+			case FLAG_DEFAULT:
+			case FLAG_MOVED:
+			case FLAG_TURN:
+				g_Tank.flag = FLAG_HOLD; break;
+			case FLAG_HOLD:
+				g_Tank.flag = FLAG_NONE; break;
+		}
 	}
 	//if (isMoved(g_Tank.flag))
 		//ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
@@ -233,12 +248,22 @@ void Render(int **map) {
 
 	// Bullet Print
 	for (i = 0; i < 5; i++) {
-		if (g_Tank_Bullet[i].nLife == 1) {
-			if (g_Tank_Bullet[i].nDirect == UP ||
-				g_Tank_Bullet[i].nDirect == DOWN)
-				ScreenPrint(g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y, "│");
-			else
-				ScreenPrint(g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y, "─");
+		if (g_Tank_Bullet[i].state == FLAG_MOVED || g_Tank_Bullet[i].state == FLAG_TURN || g_Tank_Bullet[i].state == FLAG_HOLD || g_Tank_Bullet[i].state == FLAG_DEFAULT) {
+			if (g_Tank_Bullet[i].nLife == 1) {
+				if (g_Tank_Bullet[i].nDirect == UP ||
+					g_Tank_Bullet[i].nDirect == DOWN)
+					ScreenPrint(g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y, "│");
+				else
+					ScreenPrint(g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y, "─");
+			}
+			switch (g_Tank_Bullet[i].state) {
+			case FLAG_DEFAULT:
+			case FLAG_MOVED:
+			case FLAG_TURN:
+				g_Tank_Bullet[i].state = FLAG_HOLD; break;
+			case FLAG_HOLD:
+				g_Tank_Bullet[i].state = FLAG_NONE; break;
+			}
 		}
 	}
 	sprintf(str, "nFT :%d, State :%d", g_Tank.nFireTime, hBullet);
@@ -256,8 +281,8 @@ void Render(int **map) {
 
 double calculateFPS() {
 	ntime = clock();
-	if (ntime - timebase > 200){
-		fps = (double)(nFrames * 200) / (ntime - timebase);
+	if (ntime - timebase > 500){
+		fps = (double)(nFrames*500) / (ntime - timebase);
 		timebase = ntime;
 		nFrames = 0;
 	}
