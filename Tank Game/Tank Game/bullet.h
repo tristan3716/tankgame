@@ -9,6 +9,7 @@ struct Bullet {
 	int nDirect;
 	int nOldMoveTime;
 	COORD nPos;
+	COORD nOldPos;
 };
 
 int hBullet;

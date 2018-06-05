@@ -84,51 +84,23 @@ int getOldIndex(int n) {
 void ScreenRemove(int x, int y, char* string) {
 	DWORD dw;
 	COORD CursorPosition = { x, y };
-	SetConsoleCursorPosition(g_hScreen[0], CursorPosition);
-	WriteFile(g_hScreen[0], string, strlen(string), &dw, NULL);
-	SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
-	WriteFile(g_hScreen[1], string, strlen(string), &dw, NULL);
+	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
+	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
+	//SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
+	//WriteFile(g_hScreen[1], string, strlen(string), &dw, NULL);
 }
 
 void ScreenPrintFPS(int x, int y, double num) {
-	COORD coord = { x, y };
+	//COORD coord = { x + 8, y };
 	unsigned char buffer[64];
 	
-	sprintf(buffer, "* fps : %5lf", num);
-	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], coord);
-	ScreenPrint(x, y, buffer);
+	sprintf(buffer, "%5lf", num);
+	//SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], coord);
+	ScreenPrint(x+8, y, buffer);
 }
 
 void SetColor(unsigned short color){
 	SetConsoleTextAttribute(g_hScreen[g_nScreenIndex], color);
-}
-
-void Update() {
-	int i;
-	clock_t nCurTime = clock();
-	fps = calculateFPS();
-
-	for (i = 0; i < 5; i++) {
-		if (g_Tank_Bullet[i].nLife == 1) {
-			if (nCurTime - g_Tank_Bullet[i].nOldMoveTime >= BULLET_MOVE_DELAY) {
-				switch (g_Tank_Bullet[i].nDirect) {
-				case UP:
-					g_Tank_Bullet[i].nPos.Y -= 1;
-					break;
-				case DOWN:
-					g_Tank_Bullet[i].nPos.Y += 1;
-					break;
-				case LEFT:
-					g_Tank_Bullet[i].nPos.X -= 2;
-					break;
-				case RIGHT:
-					g_Tank_Bullet[i].nPos.X += 2;
-					break;
-				}
-				g_Tank_Bullet[i].nOldMoveTime = nCurTime;
-			}
-		}
-	}
 }
 
 const char *getCharacter(int num) {
@@ -160,27 +132,69 @@ void RenderLoading() {
 
 void RenderMap(const int **map) {
 	DWORD dw;
-	COORD CursorPosition = { 0, 1 };
+	COORD CursorPosition = { 0, 0 };
 	unsigned char buffer[1024] = { 0 };
 	int i, j;
+
+	//ScreenPrint(0, 0, "* fps : ");
+	sprintf(buffer, "  * fps : ");
+	SetConsoleCursorPosition(g_hScreen[0], CursorPosition);
+	WriteFile(g_hScreen[0], buffer, sizeof(buffer), &dw, NULL);
+	SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
+	WriteFile(g_hScreen[1], buffer, sizeof(buffer), &dw, NULL);
+	CursorPosition.Y++;
+	buffer[0] = '\0';
 
 	for (j = 0; j < 30; j++) {
 		for (i = 0; i < 30; i++) {
 			strcat(buffer, getCharacter(map[j][i]));
 		}
-		SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
-		WriteFile(g_hScreen[g_nScreenIndex], buffer, sizeof(buffer), &dw, NULL);
+		SetConsoleCursorPosition(g_hScreen[0], CursorPosition);
+		WriteFile(g_hScreen[0], buffer, sizeof(buffer), &dw, NULL);
+		SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
+		WriteFile(g_hScreen[1], buffer, sizeof(buffer), &dw, NULL);
 		CursorPosition.Y++;
 		buffer[0] = '\0';
+	}
+}
+
+void Update() {
+	int i;
+	clock_t nCurTime = clock();
+	fps = calculateFPS();
+
+	for (i = 0; i < 5; i++) {
+		if (g_Tank_Bullet[i].nLife == 1) {
+			if (nCurTime - g_Tank_Bullet[i].nOldMoveTime >= BULLET_MOVE_DELAY) {
+				g_Tank_Bullet[i].nOldPos = g_Tank_Bullet[i].nPos;
+				switch (g_Tank_Bullet[i].nDirect) {
+				case UP:
+					g_Tank_Bullet[i].nPos.Y -= 1;
+					break;
+				case DOWN:
+					g_Tank_Bullet[i].nPos.Y += 1;
+					break;
+				case LEFT:
+					g_Tank_Bullet[i].nPos.X -= 2;
+					break;
+				case RIGHT:
+					g_Tank_Bullet[i].nPos.X += 2;
+					break;
+				}
+				g_Tank_Bullet[i].nOldMoveTime = nCurTime;
+			}
+		}
 	}
 }
 
 void Render(int **map) {
 	char str[100];
 	int i;
-	ScreenClear();
-
-	RenderMap(map);
+	//ScreenClear();
+	ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
+	for (i = 0; i < 5; i++) {
+		ScreenRemove(g_Tank_Bullet[i].nOldPos.X, g_Tank_Bullet[i].nOldPos.Y, "  ");
+	}
 
 	//EnterCriticalSection(&g_cs);
 	ScreenPrintFPS(0, 0, fps);
