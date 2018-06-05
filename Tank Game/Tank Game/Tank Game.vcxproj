@@ -143,6 +143,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="barricade.h" />
+    <ClInclude Include="bullet.h" />
+    <ClInclude Include="console.h" />
+    <ClInclude Include="key.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="map.h" />
+    <ClInclude Include="screen.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="tank.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bullet.c" />
+    <ClCompile Include="console.c" />
+    <ClCompile Include="key.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="map.c" />
+    <ClCompile Include="screen.c" />
+    <ClCompile Include="sound.c" />
+    <ClCompile Include="tank.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
