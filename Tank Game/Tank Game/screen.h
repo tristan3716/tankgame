@@ -4,18 +4,21 @@
 #include "tank.h"
 
 void ScreenInit();
-void ScreenFlipping();
-void ScreenClear();
+void flipScreen();
+//void ScreenClear();
 void ScreenRelease();
 void ScreenPrint(int x, int y, char* string);
 void ScreenRemove(int x, int y, char* string);
 
-void ScreenPrintFPS(int x, int y, double num);
+void renderFPS(int x, int y, double num);
 void SetColor(unsigned short color);
 
 void Render(int **map);
-void RenderMap(const int **map);
-void RenderLoading();
+
+void renderLoading();
+void renderFPSLabel();
+void renderMap(const int **map);
+
 void Update();
 
 double calculateFPS();

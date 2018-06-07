@@ -1,5 +1,5 @@
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef _SOUND_H
+#define _SOUND_H
 #pragma comment(lib,"winmm.lib")
 
 #include <stdio.h>
@@ -23,4 +23,4 @@ struct SoundList {
 void initiateSoundList(struct SoundList *this);
 void setSoundParameters(struct Params *params, struct SoundList *sHd, int id);
 
-#endif SOUND_H
+#endif _SOUND_H

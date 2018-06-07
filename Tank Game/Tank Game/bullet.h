@@ -2,7 +2,9 @@
 #include "main.h"
 #include "tank.h"
 
-#define BULLET_MOVE_DELAY 50
+#ifndef BULLET_MOVE_DELAY
+	#define BULLET_MOVE_DELAY 50
+#endif
 
 struct Bullet {
 	int nLife;

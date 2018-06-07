@@ -7,16 +7,23 @@
 #include "screen.h"
 #include "main.h"
 
-int g_nScreenIndex=2;
-int g_nOldScreenIndex;
 HANDLE g_hScreen[3];
+int g_nScreenIndex=2;
+//int g_nOldScreenIndex;
+
 int nFrames = 0;
 double fps = 0;
-time_t ntime;
-time_t timebase = 0; 
 
-void ScreenInit(){
-	CONSOLE_CURSOR_INFO cci; 
+/* =======================================================================================
+
+	Function ScreenInit ()
+		Screen()
+	Function ScreenRelease ()
+		~Screen()
+
+======================================================================================= */
+void ScreenInit() {
+	CONSOLE_CURSOR_INFO cci;
 	COORD size = { 80, 32 };
 	SMALL_RECT rect;
 	rect.Left = 0;
@@ -46,28 +53,31 @@ void ScreenInit(){
 	SetConsoleCursorInfo(g_hScreen[2], &cci);
 }
 
-void ScreenFlipping(){
-	//Sleep(22);
+void ScreenRelease() {
+	CloseHandle(g_hScreen[0]);
+	CloseHandle(g_hScreen[1]);
+	CloseHandle(g_hScreen[2]);
+}
+
+/* =======================================================================================
+
+	Function flipScreen ()
+		SetActiveBuffer (g_nScreenIndex)
+		g_nScreenIndex = !g_nScreenIndex
+
+======================================================================================= */
+void flipScreen(){
+	//Sleep(990);
 	SetConsoleActiveScreenBuffer(g_hScreen[g_nScreenIndex]);
 	nFrames++;
 	if (g_nScreenIndex == 0)
 		g_nScreenIndex = 1;
-	else if (g_nScreenIndex == 1)
-		g_nScreenIndex = 0;
-	else if (g_nScreenIndex == 2)
+	else
 		g_nScreenIndex = 0;
 }
 
-void ScreenClear(){
-	COORD Coor = { 0, 0 };
-	DWORD dw;
-	FillConsoleOutputCharacter(g_hScreen[g_nScreenIndex], ' ', 80 * 32, Coor, &dw);
-}
-
-void ScreenRelease(){
-	CloseHandle(g_hScreen[0]);
-	CloseHandle(g_hScreen[1]);
-	CloseHandle(g_hScreen[2]);
+void SetColor(unsigned short color) {
+	SetConsoleTextAttribute(g_hScreen[g_nScreenIndex], color);
 }
 
 void ScreenPrint(int x, int y, char *string){
@@ -76,51 +86,42 @@ void ScreenPrint(int x, int y, char *string){
 	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
 	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
 }
-
+/* 미사용
 int getOldIndex(int n) {
 	return !n;
 }
+*/
 
-void ScreenRemove(int x, int y, char* string) {
+/* 성능을 이유로 미사용
+void ScreenClear() {
+	COORD Coor = { 0, 0 };
 	DWORD dw;
-	COORD CursorPosition = { x, y };
-	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
-	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
-	SetConsoleCursorPosition(g_hScreen[!g_nScreenIndex], CursorPosition);
-	WriteFile(g_hScreen[!g_nScreenIndex], string, strlen(string), &dw, NULL);
-	//SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
-	//WriteFile(g_hScreen[1], string, strlen(string), &dw, NULL);
+	FillConsoleOutputCharacter(g_hScreen[g_nScreenIndex], ' ', 80 * 32, Coor, &dw);
 }
+*/
 
-void ScreenPrintFPS(int x, int y, double num) {
-	//COORD coord = { x + 8, y };
-	unsigned char buffer[64];
-	
-	sprintf(buffer, "%.2lf", num);
-	//SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], coord);
-	ScreenPrint(x+8, y, buffer);
-}
+/* =======================================================================================
 
-void SetColor(unsigned short color){
-	SetConsoleTextAttribute(g_hScreen[g_nScreenIndex], color);
-}
+	Function renderLoading ()
+		ScreenBuffer1이 작성 완료될때까지 출력하는 Buffer3 (로딩화면)
 
-const char *getCharacter(int num) {
-	switch (num) {
-		case MAP_WALL:
-			return "■";
-		case MAP_BLANK: return  "  ";
-		default: 
-			if (num > 0 && num <= MAP_BARRICADE) {
-				return "▒";
-			}
-			exit(2426);
-	}
-}
+	** 이후에 지우지 않고 재사용할 내용 작성
+	   Buffer1, 2에 모두 작성함
 
-void RenderLoading() {
+	Function renderFPSLabel ()
+		* fps :
+		라벨 출력
+
+	Function renderMap (const map)
+		ScreenBuffer1, 2에 모두 Map을 렌더링함
+	Function getCharacter (num)
+		return char[2]
+		map[x][y]에서 값에 해당하는 2바이트 아스키 문자를 반환함
+
+======================================================================================= */
+void renderLoading() {
 	DWORD dw;
-	COORD CursorPosition = { 25, 16 }; // Start from line 1
+	COORD CursorPosition = { 25, 16 };
 	unsigned char buffer[1][256] = { 
 		"          Loading ..."};
 	SetConsoleActiveScreenBuffer(g_hScreen[2]);
@@ -132,39 +133,97 @@ void RenderLoading() {
 	}
 }
 
-void RenderMap(const int **map) {
+void renderFPSLabel() {
 	DWORD dw;
-	COORD CursorPosition = { 0, 0 };
-	unsigned char buffer[1024] = { 0 };
-	int i, j;
-
-	//ScreenPrint(0, 0, "* fps : ");
+	COORD coord = { 0, 0 };
+	unsigned char buffer[16] = { 0 };
 	sprintf(buffer, "  * fps : ");
-	SetConsoleCursorPosition(g_hScreen[0], CursorPosition);
+	SetConsoleCursorPosition(g_hScreen[0], coord);
 	WriteFile(g_hScreen[0], buffer, sizeof(buffer), &dw, NULL);
-	SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
+	SetConsoleCursorPosition(g_hScreen[1], coord);
 	WriteFile(g_hScreen[1], buffer, sizeof(buffer), &dw, NULL);
-	CursorPosition.Y++;
-	buffer[0] = '\0';
+	
+}
+
+const char *getCharacter(int num);
+void renderMap(const int **map) {
+	DWORD dw;
+	COORD coord = { 0, 1 };
+	unsigned char buffer[512] = { 0 };
+	int i, j;
 
 	for (j = 0; j < 30; j++) {
 		for (i = 0; i < 30; i++) {
-			strcat(buffer, getCharacter(map[j][i]));
+			strcat(buffer, getCharacter(map[j][i])); // map[j][i]에 담긴 상수에 해당하는 아스키 문자를 버퍼에 저장
 		}
-		SetConsoleCursorPosition(g_hScreen[0], CursorPosition);
+		SetConsoleCursorPosition(g_hScreen[0], coord);
 		WriteFile(g_hScreen[0], buffer, sizeof(buffer), &dw, NULL);
-		SetConsoleCursorPosition(g_hScreen[1], CursorPosition);
+		SetConsoleCursorPosition(g_hScreen[1], coord);
 		WriteFile(g_hScreen[1], buffer, sizeof(buffer), &dw, NULL);
-		CursorPosition.Y++;
-		buffer[0] = '\0';
+		coord.Y++;
+		buffer[0] = '\0'; // 버퍼 초기화
 	}
 }
 
+const char *getCharacter(int num) {
+	switch (num) {
+	case MAP_WALL:
+		return "■";
+	case MAP_BLANK: return  "  ";
+	default:
+		if (num > 0 && num <= MAP_BARRICADE) {
+			return "▒";
+		}
+		exit(2426);
+	}
+}
+
+/* =======================================================================================
+
+	Function calculateFPS ()
+		return double(calculated FPS)
+		ntime - timebase : 이전 계산으로부터 경과한 시간
+			== 500이면 (0.5s 경과 후)
+		nFrames (Flip된 횟수) / 0.5s
+		nFrames : 1(s) = x * nFrames : 500(ms)
+			then, x = 500
+
+======================================================================================= */
+double calculateFPS() {
+	time_t ntime;
+	static time_t timebase = 0;
+
+	ntime = clock();
+	if (ntime - timebase > 500) {
+		fps = (double)(nFrames * 500) / (ntime - timebase);
+		timebase = ntime;
+		nFrames = 0;
+	}
+	// COUNTER STOP
+	if (fps > 9999)
+		return 9999;
+	return fps;
+}
+
+/* =======================================================================================
+
+	Function Update ()
+		프로그램 수행 상의 값 변경이 실제로 이루어지는 부분
+		calculateFps
+		calculateBulletPosition
+
+======================================================================================= */
 void Update() {
 	int i;
-	clock_t nCurTime = clock();
+	clock_t nCurTime;
 	fps = calculateFPS();
 
+	/* ---------------------------------------------------------------------------------------
+		Bullet Position Calculator
+			Bullet[i]의 이전 이동 시각과 현재 시각의 차이가 이동딜레이보다 크면
+			FLAG = MOVED, Old Position 설정 후 실제 이동 처리
+	--------------------------------------------------------------------------------------- */
+	nCurTime = clock();
 	for (i = 0; i < 5; i++) {
 		if (g_Tank_Bullet[i].nLife == 1) {
 			if (nCurTime - g_Tank_Bullet[i].nOldMoveTime >= BULLET_MOVE_DELAY) {
@@ -189,20 +248,49 @@ void Update() {
 		}
 	}
 }
+
 /* =======================================================================================
 
-		Render()
-		State Flow
-		Default -> Moved -> Hold -> None
-		        -> Turn  -> Hold -> None
-				-> Hold  ->
+	Function Render (map)
+		Flow
+		cls -> Render -> Flip
+		변화하는 부분 cls
+		변화하는 부분 Render
+		Flip (!g_nScreenIndex)
 
-   --------------------------------------------------------------------------------------- */
+   ======================================================================================= */
+void renderFPS(int x, int y, double num) {
+	unsigned char buffer[16];
 
+	sprintf(buffer, "%.2lf", num);
+	ScreenPrint(x + 6, y, buffer);
+}
+
+void ScreenRemove(int x, int y, char* string) {
+	DWORD dw;
+	COORD CursorPosition = { x, y };
+	SetConsoleCursorPosition(g_hScreen[g_nScreenIndex], CursorPosition);
+	WriteFile(g_hScreen[g_nScreenIndex], string, strlen(string), &dw, NULL);
+	SetConsoleCursorPosition(g_hScreen[!g_nScreenIndex], CursorPosition);
+	WriteFile(g_hScreen[!g_nScreenIndex], string, strlen(string), &dw, NULL);
+}
+
+//#define __DEBUG__
 void Render(int **map) {
-	char str[100];
-	int i;
-	//ScreenClear();
+	char buffer[64]; // DEBUG Message 출력을 위한 sprintf buffer
+	int i; // index
+
+	/* 렌더링 성능 향상을 위해 미사용, 변화하는 부분만 재출력 */
+	// ScreenClear(); /* = system("cls"); */
+
+
+	/* ---------------------------------------------------------------------------------------
+		Screen Remove
+			FLAG : 하단 Tank Print 참조
+			Tank 및 Bullet의 이전 위치 Buffer1, 2를 모두 지워줌
+			※ 주의할 점
+				- Screen Remove 과정에서 새로 출력할 경우 동기화 오류 생길 가능성
+	   --------------------------------------------------------------------------------------- */
 	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_HOLD) {
 		ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
 	}
@@ -213,7 +301,27 @@ void Render(int **map) {
 	}
 
 	//EnterCriticalSection(&g_cs);
-	ScreenPrintFPS(0, 0, fps);
+	/* ---------------------------------------------------------------------------------------
+		FPS Print
+			Update에서 calculateFPS 함수를 통해 계산된 값을 출력
+			COORD:(8, 0) - 값 부분만 변화하면서 출력 ("* fps "는 출력 후 지우지 않고 재사용)
+	   --------------------------------------------------------------------------------------- */
+	renderFPS(2, 0, fps);
+
+	/* ---------------------------------------------------------------------------------------
+		Tank Print
+			connected Client의 수 만큼 반복하여 출력, 색 구분 필요
+
+			** FLAG **
+			DEFAULT : Initialized, 시작 지점에 Print 후 HOLD 상태로 변화
+			MOVED	: 이동한 상태 -> 현재 위치 Print 및 이전 위치 Remove -> HOLD 상태로 변화
+			TURN	: 회전한 상태(제자리에서) -> 현재 위치 Print 
+					  (Remove X : 위치 변화 없으므로 현재 위치 출력과 동시에 지워짐)
+						-> HOLD 상태로 변화
+			HOLD	: 대기 상태 -> 2개의 버퍼 모두에 Print 하기 위해서 1프레임 대기 ( Print 수행)
+			NONE	: 아무 동작도 하지 않음
+	   --------------------------------------------------------------------------------------- */
+	
 	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_TURN || g_Tank.flag == FLAG_HOLD || g_Tank.flag == FLAG_DEFAULT) {
 		switch (g_Tank.nDirect) {
 			case UP:
@@ -228,7 +336,6 @@ void Render(int **map) {
 			case LEFT:
 				//SetColor(12);
 				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "◀"); break;
-			default:break;
 		}
 		switch(g_Tank.flag){
 			case FLAG_DEFAULT:
@@ -245,22 +352,27 @@ void Render(int **map) {
 	// DEBUG SOURCE
 	//SetColor(1);
 	//Sleep(500);
-	sprintf(str, "CS : %d", g_nScreenIndex);
-	ScreenPrint(62, 0, str);
-	sprintf(str, "c : (%d, %d)", g_Tank.nPos.X, g_Tank.nPos.Y);
-	ScreenPrint(62, 1, str); 
-	sprintf(str, "old : (%d, %d)", g_Tank.nOldPos.X, g_Tank.nOldPos.Y);
-	ScreenPrint(62, 2, str); 
-	sprintf(str, "state : %d", g_Tank.flag);
-	ScreenPrint(62, 12, str);
+#ifdef __DEBUG__
+	sprintf(buffer, "CS : %d", g_nScreenIndex);
+	ScreenPrint(62, 0, buffer);
+	sprintf(buffer, "c : (%d, %d)", g_Tank.nPos.X, g_Tank.nPos.Y);
+	ScreenPrint(62, 1, buffer);
+	sprintf(buffer, "old : (%d, %d)", g_Tank.nOldPos.X, g_Tank.nOldPos.Y);
+	ScreenPrint(62, 2, buffer);
+	sprintf(buffer, "state : %d", g_Tank.flag);
+	ScreenPrint(62, 12, buffer);
 
 
-	sprintf(str, "g_Tank");
-	ScreenPrint(62, 20, str);
-	sprintf(str, "* nDirect : %d", g_Tank.nDirect);
-	ScreenPrint(62, 21, str);
+	sprintf(buffer, "g_Tank");
+	ScreenPrint(62, 20, buffer);
+	sprintf(buffer, "* nDirect : %d", g_Tank.nDirect);
+	ScreenPrint(62, 21, buffer);
+#endif // __DEBUG__
 
-	// Bullet Print
+	/* ---------------------------------------------------------------------------------------
+		Bullet Print
+		connected Client * nLeftBulletCount 만큼 반복, 색 구분 X
+	   --------------------------------------------------------------------------------------- */
 	for (i = 0; i < 5; i++) {
 		if (g_Tank_Bullet[i].state == FLAG_MOVED || g_Tank_Bullet[i].state == FLAG_TURN || g_Tank_Bullet[i].state == FLAG_HOLD || g_Tank_Bullet[i].state == FLAG_DEFAULT) {
 			if (g_Tank_Bullet[i].nLife == 1) {
@@ -280,26 +392,17 @@ void Render(int **map) {
 			}
 		}
 	}
-	sprintf(str, "nFT :%d, State :%d", g_Tank.nFireTime, hBullet);
-	ScreenPrint(62, 3, str);
+#ifdef __DEBUG__
+	sprintf(buffer, "nFT :%d, State :%d", g_Tank.nFireTime, hBullet);
+	ScreenPrint(62, 3, buffer);
 	for (i = 0; i < 5; i++) {
-		sprintf(str, "%d : %d, %d", g_Tank_Bullet[i].nLife, 
+		sprintf(buffer, "%d : %d, %d", g_Tank_Bullet[i].nLife,
 			g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y);
-		ScreenPrint(62, 4+i, str);
+		ScreenPrint(62, 4+i, buffer);
 	}
+#endif __DEBUG__
 
 	//LeaveCriticalSection(&g_cs);
 
-	ScreenFlipping();
-}
-
-double calculateFPS() {
-	ntime = clock();
-	if (ntime - timebase > 500){
-		fps = (double)(nFrames*500) / (ntime - timebase);
-		timebase = ntime;
-		nFrames = 0;
-	}
-	if (fps > 9999) return 9999;
-	return fps;
+	flipScreen();
 }

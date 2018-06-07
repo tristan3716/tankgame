@@ -6,8 +6,8 @@ void initiateTank(void) {
 	g_Tank.flag = FLAG_DEFAULT;
 	g_Tank.nPos.X = 10;
 	g_Tank.nPos.Y = 10;
-	g_Tank.nOldPos.X = 10;
-	g_Tank.nOldPos.Y = 10;
+	g_Tank.nOldPos.X = 0;
+	g_Tank.nOldPos.Y = 0;
 	g_Tank.nMoveTime = 33;
 	g_Tank.nFireTime = 33;
 }
@@ -17,5 +17,5 @@ int isMoved(int flag) {
 		g_Tank.flag = FLAG_NONE;
 		return g_Tank.nOldPos.X != g_Tank.nPos.X || g_Tank.nOldPos.Y != g_Tank.nPos.Y;
 	}
-	else return false;
+	else return FALSE;
 }

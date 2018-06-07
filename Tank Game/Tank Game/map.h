@@ -6,7 +6,9 @@
 #define TANK_DS 102 // ¡å
 #define TANK_DW 103 // ¢¸
 #define TANK_DE 104 // ¢º
+
 #define BULLET 111 // ¡¤
+
 #define MAP_WALL 2001 // ¡á
 #define MAP_BARRICADE 1000 // ¢Æ 1~1000 : Barricade (endurability)
 #define MAP_BLANK 0

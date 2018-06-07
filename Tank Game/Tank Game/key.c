@@ -18,7 +18,7 @@ unsigned int WINAPI handleKey(void){
 			switch (nKey){
 				case 72: // 위쪽
 					if (nCurTime - g_Tank.nOldMoveTime >= g_Tank.nMoveTime){
-						if (g_Tank.nDirect != UP) { // 방향전환
+						if (g_Tank.nDirect != UP) { // 방향전환 (기존 방향과 다른 방향이 입력됨)
 							g_Tank.nDirect = UP;
 							g_Tank.nOldMoveTime = nCurTime; 
 							g_Tank.flag = FLAG_TURN; break;
