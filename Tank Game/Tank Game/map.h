@@ -9,7 +9,7 @@
 
 #define BULLET 111 // ¡¤
 
-#define MAP_WALL 2001 // ¡á
+#define MAP_WALL 2001 // ¡á	
 #define MAP_BARRICADE 1000 // ¢Æ 1~1000 : Barricade (endurability)
 #define MAP_BLANK 0
 

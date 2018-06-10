@@ -17,65 +17,65 @@ unsigned int WINAPI handleKey(void){
 			nCurTime = clock();
 			switch (nKey){
 				case 72: // 위쪽
-					if (nCurTime - g_Tank.nOldMoveTime >= g_Tank.nMoveTime){
+					if (nCurTime - g_Tank.nOldMoveTime >= MOVE_DELAY){
 						if (g_Tank.nDirect != UP) { // 방향전환 (기존 방향과 다른 방향이 입력됨)
 							g_Tank.nDirect = UP;
 							g_Tank.nOldMoveTime = nCurTime; 
-							g_Tank.flag = FLAG_TURN; break;
+							g_Tank.nFlag = TURN; break;
 						}
 						// 이동 (기존 방향과 같은 방향이 입력됨)
 						g_Tank.nOldPos = g_Tank.nPos;
 						g_Tank.nDirect = UP;
 						g_Tank.nPos.Y-=1;
 						g_Tank.nOldMoveTime = nCurTime;
-						g_Tank.flag = FLAG_MOVED;
+						g_Tank.nFlag = MOVED;
 					}
 					break;
 				case 80: // 아래쪽
-					if (nCurTime - g_Tank.nOldMoveTime >= g_Tank.nMoveTime){
+					if (nCurTime - g_Tank.nOldMoveTime >= MOVE_DELAY){
 						if (g_Tank.nDirect != DOWN) {
 							g_Tank.nDirect = DOWN;
 							g_Tank.nOldMoveTime = nCurTime;
-							g_Tank.flag = FLAG_TURN; break;
+							g_Tank.nFlag = TURN; break;
 						}
 						g_Tank.nOldPos = g_Tank.nPos;
 						g_Tank.nDirect = DOWN;
 						g_Tank.nPos.Y+=1;
 						g_Tank.nOldMoveTime = nCurTime;
-						g_Tank.flag = FLAG_MOVED;
+						g_Tank.nFlag = MOVED;
 					}
 					break;
 				case 75: // 왼쪽
-					if (nCurTime - g_Tank.nOldMoveTime >= g_Tank.nMoveTime){
+					if (nCurTime - g_Tank.nOldMoveTime >= MOVE_DELAY){
 						if (g_Tank.nDirect != LEFT) {
 							g_Tank.nDirect = LEFT;
 							g_Tank.nOldMoveTime = nCurTime;
-							g_Tank.flag = FLAG_TURN; break;
+							g_Tank.nFlag = TURN; break;
 						}
 						g_Tank.nOldPos = g_Tank.nPos;
 						g_Tank.nDirect = LEFT;
 						g_Tank.nPos.X-=2;
 						g_Tank.nOldMoveTime = nCurTime;
-						g_Tank.flag = FLAG_MOVED;
+						g_Tank.nFlag = MOVED;
 					}
 					break;
 				case 77: // 오른쪽
-					if (nCurTime - g_Tank.nOldMoveTime >= g_Tank.nMoveTime){
+					if (nCurTime - g_Tank.nOldMoveTime >= MOVE_DELAY){
 						if (g_Tank.nDirect != RIGHT) {
 							g_Tank.nDirect = RIGHT;
 							g_Tank.nOldMoveTime = nCurTime;
-							g_Tank.flag = FLAG_TURN; break;
+							g_Tank.nFlag = TURN; break;
 						}
 						g_Tank.nOldPos = g_Tank.nPos;
 						g_Tank.nDirect = RIGHT;
 						g_Tank.nPos.X+=2;
 						g_Tank.nOldMoveTime = nCurTime;
-						g_Tank.flag = FLAG_MOVED;
+						g_Tank.nFlag = MOVED;
 					}
 					break;
 				case ' ': // 스페이스바
 					hBullet = 1; // 스페이스바 눌렸는지 확인 (DEBUG)
-					if (nCurTime - g_Tank.nOldFireTime >= g_Tank.nFireTime) {
+					if (nCurTime - g_Tank.nOldFireTime >= FIRE_DELAY) {
 						for (i = 0; i < 5; i++) {
 							if (g_Tank_Bullet[i].nLife == 0) {
 								g_Tank_Bullet[i].nLife = 1;

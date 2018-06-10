@@ -227,7 +227,7 @@ void Update() {
 	for (i = 0; i < 5; i++) {
 		if (g_Tank_Bullet[i].nLife == 1) {
 			if (nCurTime - g_Tank_Bullet[i].nOldMoveTime >= BULLET_MOVE_DELAY) {
-				g_Tank_Bullet[i].state = FLAG_MOVED;
+				g_Tank_Bullet[i].state = MOVED;
 				g_Tank_Bullet[i].nOldPos = g_Tank_Bullet[i].nPos;
 				switch (g_Tank_Bullet[i].nDirect) {
 				case UP:
@@ -291,11 +291,11 @@ void Render(int **map) {
 			※ 주의할 점
 				- Screen Remove 과정에서 새로 출력할 경우 동기화 오류 생길 가능성
 	   --------------------------------------------------------------------------------------- */
-	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_HOLD) {
+	if (g_Tank.nFlag == MOVED || g_Tank.nFlag == HOLD) {
 		ScreenRemove(g_Tank.nOldPos.X, g_Tank.nOldPos.Y, "  ");
 	}
 	for (i = 0; i < 5; i++) {
-		if (g_Tank_Bullet[i].state == FLAG_MOVED || g_Tank_Bullet[i].state == FLAG_HOLD) {
+		if (g_Tank_Bullet[i].state == MOVED || g_Tank_Bullet[i].state == HOLD) {
 			ScreenRemove(g_Tank_Bullet[i].nOldPos.X, g_Tank_Bullet[i].nOldPos.Y, "  ");
 		}
 	}
@@ -322,7 +322,7 @@ void Render(int **map) {
 			NONE	: 아무 동작도 하지 않음
 	   --------------------------------------------------------------------------------------- */
 	
-	if (g_Tank.flag == FLAG_MOVED || g_Tank.flag == FLAG_TURN || g_Tank.flag == FLAG_HOLD || g_Tank.flag == FLAG_DEFAULT) {
+	if (g_Tank.nFlag == MOVED || g_Tank.nFlag == TURN || g_Tank.nFlag == HOLD || g_Tank.nFlag == DEFAULT) {
 		switch (g_Tank.nDirect) {
 			case UP:
 				//SetColor(12);
@@ -337,13 +337,13 @@ void Render(int **map) {
 				//SetColor(12);
 				ScreenPrint(g_Tank.nPos.X, g_Tank.nPos.Y, "◀"); break;
 		}
-		switch(g_Tank.flag){
-			case FLAG_DEFAULT:
-			case FLAG_MOVED:
-			case FLAG_TURN:
-				g_Tank.flag = FLAG_HOLD; break;
-			case FLAG_HOLD:
-				g_Tank.flag = FLAG_NONE; break;
+		switch(g_Tank.nFlag){
+			case DEFAULT:
+			case MOVED:
+			case TURN:
+				g_Tank.nFlag = HOLD; break;
+			case HOLD:
+				g_Tank.nFlag = NONE; break;
 		}
 	}
 	//if (isMoved(g_Tank.flag))
@@ -374,7 +374,8 @@ void Render(int **map) {
 		connected Client * nLeftBulletCount 만큼 반복, 색 구분 X
 	   --------------------------------------------------------------------------------------- */
 	for (i = 0; i < 5; i++) {
-		if (g_Tank_Bullet[i].state == FLAG_MOVED || g_Tank_Bullet[i].state == FLAG_TURN || g_Tank_Bullet[i].state == FLAG_HOLD || g_Tank_Bullet[i].state == FLAG_DEFAULT) {
+		if (g_Tank_Bullet[i].state == MOVED || g_Tank_Bullet[i].state == TURN
+			|| g_Tank_Bullet[i].state == HOLD || g_Tank_Bullet[i].state == DEFAULT) {
 			if (g_Tank_Bullet[i].nLife == 1) {
 				if (g_Tank_Bullet[i].nDirect == UP ||
 					g_Tank_Bullet[i].nDirect == DOWN)
@@ -383,17 +384,17 @@ void Render(int **map) {
 					ScreenPrint(g_Tank_Bullet[i].nPos.X, g_Tank_Bullet[i].nPos.Y, "─");
 			}
 			switch (g_Tank_Bullet[i].state) {
-			case FLAG_DEFAULT:
-			case FLAG_MOVED:
-			case FLAG_TURN:
-				g_Tank_Bullet[i].state = FLAG_HOLD; break;
-			case FLAG_HOLD:
-				g_Tank_Bullet[i].state = FLAG_NONE; break;
+			case DEFAULT:
+			case MOVED:
+			case TURN:
+				g_Tank_Bullet[i].state = HOLD; break;
+			case HOLD:
+				g_Tank_Bullet[i].state = NONE; break;
 			}
 		}
 	}
 #ifdef __DEBUG__
-	sprintf(buffer, "nFT :%d, State :%d", g_Tank.nFireTime, hBullet);
+	//sprintf(buffer, "nFT :%d, State :%d", FIRE_DELAY, hBullet);
 	ScreenPrint(62, 3, buffer);
 	for (i = 0; i < 5; i++) {
 		sprintf(buffer, "%d : %d, %d", g_Tank_Bullet[i].nLife,

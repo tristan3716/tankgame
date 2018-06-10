@@ -2,19 +2,19 @@
 
 struct Tank g_Tank;
 
-void initiateTank(void) {
-	g_Tank.flag = FLAG_DEFAULT;
-	g_Tank.nPos.X = 10;
-	g_Tank.nPos.Y = 10;
-	g_Tank.nOldPos.X = 0;
-	g_Tank.nOldPos.Y = 0;
-	g_Tank.nMoveTime = 33;
-	g_Tank.nFireTime = 33;
+void initiateTank(struct Tank *this) {
+	this->nFlag = DEFAULT;
+	this->nPos.X = 10;
+	this->nPos.Y = 10;
+	this->nOldPos.X = 0;
+	this->nOldPos.Y = 0;
+
+	this->isMoved = isMoved;
 }
 
 int isMoved(int flag) {
-	if (flag == FLAG_MOVED) {
-		g_Tank.flag = FLAG_NONE;
+	if (flag == MOVED) {
+		g_Tank.nFlag = NONE;
 		return g_Tank.nOldPos.X != g_Tank.nPos.X || g_Tank.nOldPos.Y != g_Tank.nPos.Y;
 	}
 	else return FALSE;
