@@ -23,6 +23,7 @@
 #endif
 
 #define DEFAULT_PORT 46464
+#define PONG 100
 
 void handleError(char *message);
 void startServer(SOCKET *hServSock, SOCKADDR_IN *servAdr);

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <winsock.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifndef BUF_SIZE
 	#define BUF_SIZE 1024
@@ -19,7 +20,11 @@
 
 #define MATCHED 1
 #define GAME_END 1
+#define DEFAULT_PORT 46464
+#define PING 100
 
 void handleError(char *message);
+void startClient(SOCKET *hSocket, SOCKADDR_IN *servAdr);
+int ping(SOCKET hSocket);
 
 #endif MAIN_H

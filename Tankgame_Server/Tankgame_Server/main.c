@@ -34,6 +34,17 @@ void startServer(SOCKET *hServSock, SOCKADDR_IN *servAdr) {
 	printf("Wait Client ...\n"); //DEBUG
 }
 
+int pong(SOCKET hClntSock) {
+	int nSignal;
+	//time_t nCurTime = clock();
+	recv(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
+	send(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
+	//nSignal = clock() - nCurTime;
+	recv(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
+	printf("Pong %d ms\n", nSignal);
+	return nSignal;
+}
+
 int main(void){
 	SOCKET hServSock, hClntSock[USER_COUNT];
 	SOCKADDR_IN servAdr, clntAdr;
@@ -51,6 +62,7 @@ int main(void){
 		hClntSock[i] = accept(hServSock, (SOCKADDR*)&clntAdr, &clntAdrSize);
 		printf("Client %d is conneted\n", i+1); //DEBUG
 		printf("\t(Cid : %d)\n", hClntSock[i]); //DEBUG
+		pong(hClntSock[i]);
 	}
 	printf("2 Clinet is conneted\n"); //DEBUG
 
