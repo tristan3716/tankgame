@@ -11,11 +11,12 @@
 #include <time.h> // clock
 //#include <winsock2.h>
 #include "sound.h" 
+#include "map.h"
 //#include "console.h"
 //#include "screen.h"
 
-#include "map.h"
 //#include "key.h"
+#include "pong.h"
 
 #ifndef BUF_SIZE
 	#define BUF_SIZE 1024

@@ -15,6 +15,7 @@
 #include "screen.h"
 #include "keyhandler.h"
 #include "ping.h"
+#include "tank.h"
 
 #define BUF_SIZE 555
 
@@ -36,6 +37,7 @@ void ping(SOCKET hSocket);
 
 extern int g_nScreenFlag_Sub;
 extern int g_nScreenFlag;
-extern COORD *nCurTankPositions;
+
+extern struct Tank *g_Tank;
 
 #endif _MAIN_H

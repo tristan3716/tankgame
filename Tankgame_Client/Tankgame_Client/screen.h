@@ -1,6 +1,10 @@
 #ifndef _SCREEN_H
 #define _SCREEN_H
 
+#include <windows.h>
+#include <time.h>
+#include <stdio.h>
+#include "main.h"
 #include "map.h"
 
 #define SCREEN_SIZE_X 61
@@ -14,7 +18,6 @@ typedef enum _SCREEN_FLAG {
 } SCREEN_FLAG;
 
 unsigned int WINAPI handleScreen(void *arg);
-unsigned int WINAPI handleScreen2(void);
 
 void initializeScreen();
 void releaseScreen(int index);

@@ -91,7 +91,7 @@ int main(void) {
 			break;
 		}
 	}
-	nCurTankPositions = (COORD *)malloc(sizeof(COORD) * nMaxUserCount);
+	g_Tank = (struct Tank *)malloc(sizeof(struct Tank) * nMaxUserCount);
 	hThread[1] = (HANDLE)_beginthreadex(NULL, 0, handleKey, &hSocket, 0, (unsigned*)&dwThreadID);
 	hThread[2] = (HANDLE)_beginthreadex(NULL, 0, checkPing, &hSocket, 0, (unsigned*)&dwThreadID);
 
@@ -99,12 +99,14 @@ int main(void) {
 		recv(hSocket, cSignal, sizeof(cSignal), 0);
 		switch (cSignal[0]) {
 		case SET_DEFAULT_POSITION:
-			recv(hSocket, msg, sizeof(char) * nMaxUserCount * 2, 0);
+			recv(hSocket, msg, sizeof(char) * nMaxUserCount * 5, 0);
 			for (i = 0; i < nMaxUserCount; i++) {
-				nCurTankPositions[i].X = msg[2*i];
-				nCurTankPositions[i].X = msg[2*i+1];
-
+				g_Tank[i].nCurPosition.X = msg[2 * i];
+				g_Tank[i].nCurPosition.Y = msg[2 * i + 1];
+				g_Tank[i].CID = *(short *)&msg[2 * i + 2];
+				g_Tank[i].nDirect = msg[2 * i + 4];
 			}
+			g_nScreenFlag_Sub = RENDER_TANK;
 			break;
 		}
 

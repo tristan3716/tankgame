@@ -1,11 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <windows.h>
-#include <time.h>
-#include <stdio.h>
-#include <math.h>
 #include "screen.h"
-#include "main.h"
 
 HANDLE g_hScreen[3];
 int g_nScreenIndex = 2;
@@ -21,13 +16,13 @@ int alignCenter(const char *str) {
 	return (int)((SCREEN_SIZE_X / 2) - (strlen(str) / 2));
 }
 
-COORD *nCurTankPositions;
 
 unsigned int WINAPI handleScreen(void *arg) {
 	int **map = arg;
 	char buffer[BUF_SIZE];
 	static time_t nCurTime;
-	char buf[10];;
+	char buf[10];
+	int i;
 
 	initializeScreen();
 
@@ -94,7 +89,29 @@ unsigned int WINAPI handleScreen(void *arg) {
 				renderFPSLabel();
 				renderPingLabel();
 				while (g_nScreenFlag == INGAME) {
-					switch (g_nScreenFlag_Sub == RENDER_TANK) {
+					switch (g_nScreenFlag_Sub) {
+						case RENDER_TANK:
+							for (i = 0; i < nMaxUserCount; i++) {
+								switch (g_Tank[i].nDirect) {
+									case UP:
+										sprintf(buffer, "¡ã");
+									case DOWN:
+										sprintf(buffer, "¡å");
+									case LEFT:
+										sprintf(buffer, "¢¸");
+									case RIGHT:
+										sprintf(buffer, "¢º");
+								}
+								if (g_Tank[i].CID == nCID) {
+									SetColor(FOREGROUND_RED);
+								}
+								else {
+									SetColor(FOREGROUND_RED|FOREGROUND_GREEN);
+								}
+								s_print(g_Tank[i].nCurPosition.X, g_Tank[i].nCurPosition.Y, buffer);
+							}
+							g_nScreenFlag_Sub = NONE;
+							break;
 					}
 					calculateFPS();
 					renderFPS(4, 0, fps);

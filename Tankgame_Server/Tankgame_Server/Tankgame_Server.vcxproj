@@ -144,12 +144,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="map.c" />
+    <ClCompile Include="pong.c" />
     <ClCompile Include="sound.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
     <ClInclude Include="map.h" />
-    <ClInclude Include="map.c" />
+    <ClInclude Include="pong.h" />
     <ClInclude Include="sound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

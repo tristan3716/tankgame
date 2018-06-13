@@ -1,6 +1,5 @@
 #include "keyhandler.h"
 
-
 unsigned int WINAPI handleKey(void *arg) {
 	static int nKey;
 	static int i;

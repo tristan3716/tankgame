@@ -33,17 +33,6 @@ void startServer(SOCKET *hServSock, SOCKADDR_IN *servAdr) {
 	printf("Wait Client ...\n"); //DEBUG
 }
 
-int pong(SOCKET hClntSock) {
-	int nSignal;
-	//time_t nCurTime = clock();
-	recv(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
-	send(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
-	//nSignal = clock() - nCurTime;
-	recv(hClntSock, (char *)&nSignal, sizeof(nSignal), 0);
-	printf("Pong %d ms\n", nSignal);
-	return nSignal;
-}
-
 int main(void){
 	SOCKET hServSock, hClntSock[USER_COUNT];
 	SOCKADDR_IN servAdr, clntAdr;
@@ -52,6 +41,8 @@ int main(void){
 	int i, j;
 	char msg[BUF_SIZE];
 	time_t nCurTime; 
+	int **map;
+
 	//printf("¢Ë¢Æ¡á");
 	startServer(&hServSock, &servAdr);
 	clntAdrSize = sizeof(clntAdr);
@@ -81,7 +72,7 @@ int main(void){
 			send(hClntSock[i], (char *)&nSignal, sizeof(nSignal), 0);
 		}
 		nSignal = 0;
-		/*
+		parseMap(&map, MAP_NUMBER);
 		printf("Game Start !\n"); //DEBUG
 
 		nCurTime = clock();
@@ -97,9 +88,9 @@ int main(void){
 			}
 			// Space of Game Progressing
 
-			//
+			//recv()
 		}
-		*/
+		
 
 		for (i = 0; i < USER_COUNT; i++) {
 			closesocket(hClntSock[i]);
