@@ -143,10 +143,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="keyhandler.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="map.c" />
+    <ClCompile Include="ping.c" />
+    <ClCompile Include="screen.c" />
+    <ClCompile Include="sound.c" />
+    <ClCompile Include="tank.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="keyhandler.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="map.h" />
+    <ClInclude Include="ping.h" />
+    <ClInclude Include="screen.h" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="tank.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

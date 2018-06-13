@@ -11,15 +11,20 @@ unsigned int WINAPI playSoundThread(void *arg) {
 unsigned int WINAPI handleScreen(void *arg) {
 	//console_setWhite();
 	ScreenInit();
+	printf("HELLO");
 
 	renderLoading();
+	printf("HELLO");
 	//Sleep(500);
 	flipScreen();
 
+	printf("HELLO");
 	renderFPSLabel();
+	printf("HELLO");
 	renderMap(arg);
+	printf("HELLO");
 	//ScreenFlipping();
-	while (TRUE) {
+	while (1) {
 		Update();
 		Render(arg);
 	}
@@ -55,13 +60,14 @@ int main(void) {
 	// warning C4028: 정식 매개 변수 1이(가) 선언과 다릅니다. ????
 	hThread = (HANDLE)_beginthreadex(NULL, 0, handleKey, NULL, 0, (unsigned*)&dwThreadID);
 	// Screen Handle
-	hThread = (HANDLE)_beginthreadex(NULL, 0, handleScreen, map, 0, (unsigned*)&dwThreadID);
+	hThread2 = (HANDLE)_beginthreadex(NULL, 0, handleScreen, map, 0, (unsigned*)&dwThreadID);
 
 
 	//setSoundParameters(&sparams, &sHd, SOUND_EXPLOSION);
 	//hThread = (HANDLE)_beginthreadex(NULL, 0, playSoundThread, &sparams, 0, (unsigned*)&dwThreadID);
-	
+
 	WaitForSingleObject(hThread, INFINITE);
+	WaitForSingleObject(hThread2, INFINITE);
 
 	ScreenRelease();
 	DeleteCriticalSection(&g_cs);

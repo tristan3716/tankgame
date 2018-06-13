@@ -149,7 +149,7 @@ const char *getCharacter(int num);
 void renderMap(const int **map) {
 	DWORD dw;
 	COORD coord = { 0, 1 };
-	unsigned char buffer[512] = { 0 };
+	unsigned char buffer[1024] = { 0 };
 	int i, j;
 
 	for (j = 0; j < 30; j++) {
@@ -172,7 +172,7 @@ const char *getCharacter(int num) {
 	case MAP_BLANK: return  "  ";
 	default:
 		if (num > 0 && num <= MAP_BARRICADE) {
-			return "▒";
+			return "▨";
 		}
 		exit(2426);
 	}

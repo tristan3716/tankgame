@@ -9,7 +9,7 @@ BOOL isGameProgressing(int signal) {
 }
 
 void GAME(void) {
-	printf("Game is Progressing...\n");
+	//printf("Game is Progressing...\n");
 	return;
 }
 
@@ -36,49 +36,75 @@ void startClient(SOCKET *hSocket, SOCKADDR_IN *servAdr) {
 	servAdr->sin_port = htons(DEFAULT_PORT);
 }
 
-int ping(SOCKET hSocket) {
-	int nSignal = PING;
-	time_t nCurTime = clock();
-	srand((unsigned)time(NULL));
-	srand((rand()%300*5)%300);
-	send(hSocket, (char *)&nSignal, sizeof(nSignal), 0);
-	Sleep(rand()%300);
-	recv(hSocket, (char *)&nSignal, sizeof(nSignal), 0);
-	nSignal = (int)(clock() - nCurTime);
-	send(hSocket, (char *)&nSignal, sizeof(nSignal), 0);
-	printf("Ping %d ms\n", nSignal);
-	return nSignal;
-	COORD coord;
-}
+int nMaxUserCount;
+int nCurUserCount;
+int nCID;
+int nMapNumber;
 
 int main(void) {
 	SOCKET hSocket;
 	int nSignal,i;
 	SOCKADDR_IN	servAdr;
 	char msg[BUF_SIZE];
+	char cSignal[2];
+
+	HANDLE hThread[3];
+	DWORD dwThreadID = (DWORD)NULL;
+
+	int **map;
+	system("mode con cols=61 lines=32");
+	g_nScreenFlag = LOADING;
 
 	startClient(&hSocket, &servAdr);
+	hThread[0] = (HANDLE)_beginthreadex(NULL, 0, handleScreen, &map, 0, (unsigned*)&dwThreadID);
 
-	if (connect(hSocket, (SOCKADDR*)&servAdr, sizeof(servAdr)) == SOCKET_ERROR)
-		handleError("connect() error!");
-	else
-		puts("Connected...........\n"); //DEBUG
-	ping(hSocket);
-
+	// Try Connect to Server
 	while (TRUE) {
-		printf("matching ...\n"); //DEBUG
-		recv(hSocket, (char *)&nSignal, sizeof(nSignal), 0);
-		printf("Received Signal is %d\n", nSignal); //DEBUG
-		if (isMatched(nSignal)) {
-			printf("matching FINISH!\n"); //DEBUG
+		if (connect(hSocket, (SOCKADDR*)&servAdr, sizeof(servAdr)) == SOCKET_ERROR) {
+			g_nScreenFlag_Sub = CONNECTION_FAIL;
+			continue;
+		}
+		else {
+			ping(hSocket);
+			g_nScreenFlag_Sub = CONNECTION_SUCCESS;
 			break;
 		}
 	}
+	Sleep(500);
+	// Initialize Default Information
+	recv(hSocket, msg, 5, 0);
+	nCID = (int)msg[1];
+	nMaxUserCount = (int)msg[2];
+	nCurUserCount = (int)msg[3];
+	nMapNumber = (int)msg[4];
+	g_nScreenFlag_Sub = CONNECTION_FINISH;
+	g_nScreenFlag = MATCHING;
+
+	// Wait for Match Making
+	while (TRUE) {
+		recv(hSocket, cSignal, sizeof(cSignal), 0);
+		if (*cSignal == JOIN_USER) {
+			nCurUserCount++;
+		}
+		else if (*cSignal == MATCHED){
+			g_nScreenFlag_Sub = MATCHING_FINISH;
+			break;
+		}
+	}
+	nCurTankPositions = (COORD *)malloc(sizeof(COORD) * nMaxUserCount);
+	hThread[1] = (HANDLE)_beginthreadex(NULL, 0, handleKey, &hSocket, 0, (unsigned*)&dwThreadID);
+	hThread[2] = (HANDLE)_beginthreadex(NULL, 0, checkPing, &hSocket, 0, (unsigned*)&dwThreadID);
 
 	while (TRUE) {
-		recv(hSocket, (char *)&nSignal, sizeof(nSignal), 0);
-		if (isGameProgressing(nSignal)) {
-			printf("Game End !\n"); //DEBUG
+		recv(hSocket, cSignal, sizeof(cSignal), 0);
+		switch (cSignal[0]) {
+		case SET_DEFAULT_POSITION:
+			recv(hSocket, msg, sizeof(char) * nMaxUserCount * 2, 0);
+			for (i = 0; i < nMaxUserCount; i++) {
+				nCurTankPositions[i].X = msg[2*i];
+				nCurTankPositions[i].X = msg[2*i+1];
+
+			}
 			break;
 		}
 
@@ -92,7 +118,6 @@ int main(void) {
 }
 
 void handleError(char *message) {
-	fputs(message, stderr);
-	fputc('\n', stderr);
-	exit(1);
+	s_print(0, 0, message);
+	//exit(1);
 }
