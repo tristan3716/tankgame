@@ -2,14 +2,17 @@
 #define _MAIN_H
 
 #pragma comment(lib, "WS2_32.lib")
+#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+	#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <winsock2.h> // need to locate above windows.h
 #include <Windows.h> // MMSystem.h
 #include <MMSystem.h> // PlaySound function
 #include <process.h> // _beginthreadex
 #include <time.h> // clock
-//#include <winsock2.h>
 #include "sound.h" 
 #include "map.h"
 //#include "console.h"
@@ -23,10 +26,10 @@
 #endif
 
 #ifndef FALSE
-#define FALSE (0)
+	#define FALSE (0)
 #endif
 #ifndef TRUE
-#define TRUE !FALSE
+	#define TRUE !FALSE
 #endif
 
 #define DEFAULT_PORT 46464

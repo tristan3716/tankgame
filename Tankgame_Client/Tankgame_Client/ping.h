@@ -1,10 +1,7 @@
 #ifndef _PING_H
 #define _PING_H
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <winsock.h>
+#include "stdafx.h"
 #include "main.h"
 
 void ping(SOCKET hSocket);

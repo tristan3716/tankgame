@@ -1,10 +1,7 @@
 #ifndef _TANK_H
 #define _TANK_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> // strcpy
-#include <Windows.h> // mbstowcs
+#include "stdafx.h"
 #include "keyhandler.h"
 
 struct Tank {

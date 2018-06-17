@@ -2,10 +2,7 @@
 #define _SOUND_H
 #pragma comment(lib,"winmm.lib")
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> // strcpy
-#include <Windows.h> // mbstowcs
+#include "stdafx.h"
 #include "main.h"
 
 #define SOUND_EXPLOSION 101

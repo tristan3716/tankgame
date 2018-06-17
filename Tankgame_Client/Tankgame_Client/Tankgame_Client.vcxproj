@@ -89,6 +89,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -149,6 +150,9 @@
     <ClCompile Include="ping.c" />
     <ClCompile Include="screen.c" />
     <ClCompile Include="sound.c" />
+    <ClCompile Include="stdafx.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="tank.c" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +162,7 @@
     <ClInclude Include="ping.h" />
     <ClInclude Include="screen.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="tank.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

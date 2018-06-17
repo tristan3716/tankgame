@@ -1,10 +1,7 @@
 #ifndef _KEY_HANDLER_H
 #define _KEY_HANDLER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <conio.h>
+#include "stdafx.h"
 #include "main.h"
 
 #define MOVE_DELAY 33

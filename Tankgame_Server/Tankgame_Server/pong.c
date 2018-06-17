@@ -14,10 +14,19 @@ int pong(SOCKET hClntSock) {
 }
 
 
-unsigned int WINAPI checkPing(void *arg) {
+unsigned int WINAPI receiver(void *arg) {
 	SOCKET hSocket = (SOCKET)arg;
+	Packet packet;
+	char buf[5];
+
 	while (1) {
-		pong(hSocket);
-		Sleep(11);
+		recv(hSocket, buf, 5, 0);
+
+		packet.signal = buf[0];
+		packet.id = (short)&buf[1]; // CID range 2^8 ÃÊ°úÇÔ -> short or int
+		packet.x = buf[3];
+		packet.y = buf[4];
+
+		enQueue(&queue, packet);
 	}
 }

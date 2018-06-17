@@ -5,12 +5,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <winsock.h>
-#include <time.h>
-#include <process.h>
-#include <conio.h>
+#include "stdafx.h"
+#include <mmsystem.h>
 
 #include "screen.h"
 #include "keyhandler.h"

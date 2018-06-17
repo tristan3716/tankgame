@@ -5,34 +5,45 @@ int stoms(const int num) {
 }
 
 /* =======================================================================================
-		Initiate Server
+		Initialized Server
 			Ip Address	: 127.0.0.1
 			Port		: DEFAULT_PORT(46464, main.h)
 	--------------------------------------------------------------------------------------- */
-void startServer(SOCKET *hServSock, SOCKADDR_IN *servAdr) {
+void setupServer(SOCKET *hServSock, SOCKADDR_IN *servAdr) {
 	WSADATA	wsaData;
 
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		handleError("WSAStartup() error!");
+		exit(1);
+	}
 
-	*hServSock = socket(PF_INET, SOCK_STREAM, 0);
-	if (*hServSock == INVALID_SOCKET)
+	*hServSock = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (*hServSock == INVALID_SOCKET) {
 		handleError("socket() error");
+		exit(1);
+	}
 
 	memset(servAdr, 0, sizeof(servAdr));
-	servAdr->sin_family = AF_INET;
+	servAdr->sin_family = PF_INET;
 	servAdr->sin_addr.s_addr = inet_addr("127.0.0.1");
 	servAdr->sin_port = htons(DEFAULT_PORT);
 
-	if (bind(*hServSock, (SOCKADDR*)servAdr, sizeof(*servAdr)) == SOCKET_ERROR)
+	if (bind(*hServSock, (SOCKADDR*)servAdr, sizeof(*servAdr)) == SOCKET_ERROR) {
 		handleError("bind() error");
+		closesocket(hServSock);
+		WSACleanup();
+		exit(1);
+	}
 	printf("Server Established\n"); //DEBUG
 
-	if (listen(*hServSock, USER_COUNT) == SOCKET_ERROR)
+	if (listen(*hServSock, 5) == SOCKET_ERROR) {
 		handleError("listen() error");
+		closesocket(hServSock);
+		WSACleanup();
+		exit(1);
+	}
 	printf("Wait Client ...\n"); //DEBUG
 }
-
 int main(void){
 	SOCKET hServSock, hClntSock[USER_COUNT];
 	SOCKADDR_IN servAdr, clntAdr;
@@ -42,10 +53,30 @@ int main(void){
 	char msg[BUF_SIZE];
 	time_t nCurTime; 
 	int **map;
+	HANDLE *hThread;
+	DWORD dwThreadID = (DWORD)NULL;
+
+/*
+	HANDLE hIOCP;
+	SYSTEM_INFO systemInfo;
+	int threadCount, i;
+	unsigned long threadId;
+	HANDLE *hThread;
+*/
 
 	//printf("¢Ë¢Æ¡á");
-	startServer(&hServSock, &servAdr);
+	setupServer(&hServSock, &servAdr);
 	clntAdrSize = sizeof(clntAdr);
+
+	/*
+	hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+	GetSystemInfo(&systemInfo);
+	threadCount = systemInfo.dwNumberOfProcessors * 2;
+	hThread = (HANDLE *)malloc(threadCount * sizeof(HANDLE));
+	for (i = 0; i < threadCount; i++) {
+		hThread[i] = CreateThread(NULL, 0, makeThread, &hIOCP, 0, &threadId);
+	}
+	*/
 
 	while (1) {
 		for (i = 0; i < USER_COUNT; i++) {
@@ -88,7 +119,11 @@ int main(void){
 			}
 			// Space of Game Progressing
 
-			//recv()
+			// Start Receiver Threads
+			hThread = (HANDLE *)malloc(sizeof(HANDLE) * USER_COUNT);
+			for (i = 0; i < USER_COUNT; i++) {
+				hThread[i] = (HANDLE)_beginthreadex(NULL, 0, receiver, &hClntSock[i], 0, (unsigned*)&dwThreadID);
+			}
 		}
 		
 
@@ -104,5 +139,5 @@ int main(void){
 void handleError(const char *message){
 	fputs(message, stderr);
 	fputc('\n', stderr);
-	exit(1);
+	//exit(1);
 }

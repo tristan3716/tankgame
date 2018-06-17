@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stdafx.h"
 #include "main.h"
 
 typedef enum _TILESET {WALL=2001, BARRICADE=1000, BLANK=0} TILESET;

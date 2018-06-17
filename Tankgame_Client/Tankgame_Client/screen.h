@@ -1,9 +1,7 @@
 #ifndef _SCREEN_H
 #define _SCREEN_H
 
-#include <windows.h>
-#include <time.h>
-#include <stdio.h>
+#include "stdafx.h"
 #include "main.h"
 #include "map.h"
 
