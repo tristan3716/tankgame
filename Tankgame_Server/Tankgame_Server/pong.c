@@ -14,19 +14,34 @@ int pong(SOCKET hClntSock) {
 }
 
 
-unsigned int WINAPI receiver(void *arg) {
+unsigned int WINAPI receiver(void *arg) { // arg : socket *&hClntSock[i]
 	SOCKET hSocket = (SOCKET)arg;
 	Packet packet;
 	char buf[5];
 
 	while (1) {
-		recv(hSocket, buf, 5, 0);
+		//printf("receiver is spamming ...\n");
+		Sleep(33);
+		if (recv(hSocket, buf, 5, 0) != SOCKET_ERROR) {
 
-		packet.signal = buf[0];
-		packet.id = (short)&buf[1]; // CID range 2^8 ÃÊ°úÇÔ -> short or int
-		packet.x = buf[3];
-		packet.y = buf[4];
+			if (buf[0] == CLIENT_ACTIVE_CLOSE) {
+				printf("Client %d send active close ...\n", hSocket);
+				closesocket(hSocket);
+				return 0;
+			}
 
-		enQueue(&queue, packet);
+			packet.signal = buf[0];
+			packet.objectId = buf[1];
+			packet.x = buf[2];
+			packet.y = buf[3];
+			packet.nDirect = buf[4];
+			packet.cid = hSocket;
+			packet.nRecvTime = clock();
+			  
+			printf("packet Receive from %d (Signal : %d, id : %d, Coord : (%d, %d))\n",
+				hSocket, packet.signal, packet.objectId, packet.x, packet.y);
+
+			enQueue(&queue, packet);
+		}
 	}
 }

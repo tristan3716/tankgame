@@ -13,18 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{37637668-3662-4758-9bc7-d4f6553edda8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="pong.c">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="stdafx.c">
+      <Filter>PCH</Filter>
     </ClCompile>
-    <ClCompile Include="map.c">
+    <ClCompile Include="keyHandler.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="tank.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="sound.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="screen.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ping.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="map.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="queue.c">
@@ -35,13 +50,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
     <ClInclude Include="main.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="pong.h">
+    <ClInclude Include="keyHandler.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="map.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ping.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="screen.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="sound.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="tank.h">

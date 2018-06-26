@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <winsock.h>
 //#include "main.h"
-#include "net.h"
+#include "queue.h"
+#include "../../signal.h"
 
 #ifndef BUF_SIZE
 	#define BUF_SIZE 1024
